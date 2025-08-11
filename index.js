@@ -31,7 +31,7 @@ async function generateAIContent() {
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt =
-    "You are creating content for Twitter/X. Generate an empowering and encouraging tweet for women who are heartbroken and need encouragement. Focus on self-love, inner strength, beauty, healing, and moving forward. The message should be uplifting, authentic, and remind them of their worth. IMPORTANT: The tweet must be EXACTLY under 280 characters including spaces, emojis, and hashtags. Use plain text with emojis and include 2-3 relevant hashtags like #SelfLove #Healing #Strength. Make it feel personal and supportive. Do not exceed 280 characters.";
+    "You are creating content for Twitter/X. Generate an uplifting and motivational tweet. Focus on positivity, achieving goals, overcoming challenges, and inspiring others. The message should be authentic and remind people of their potential. IMPORTANT: The tweet must be EXACTLY under 280 characters including spaces, emojis, and hashtags. Use plain text with emojis and include 2-3 relevant hashtags like #Motivation #Inspiration #Success. Make it feel personal and supportive. Do not exceed 280 characters.";
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
@@ -55,48 +55,49 @@ async function generateAIContent() {
 }
 
 function generateTemplateContent() {
-  // Enhanced content with motivational quotes and high-visibility hashtags
+  // Enhanced content with general motivational themes
   const contentTypes = [
-    // Motivational quotes
+    // General motivational quotes
     {
       type: "motivational_quotes",
       templates: [
-        '"Your current situation is not your final destination. Keep moving forward." 🚀 #Motivation #Success #NeverGiveUp #Inspiration',
-        '"The strongest people are not those who show strength in front of us, but those who win battles we know nothing about." 💪 #MentalHealth #Strength #Warrior #Resilience',
-        '"You are not broken. You are breaking through." ✨ #Breakthrough #Growth #Healing #SelfLove',
-        '"Your worth is not determined by your productivity." 🌟 #SelfWorth #MentalHealthAwareness #Validation #YouMatter',
-        '"Progress, not perfection." 📈 #Progress #Growth #Mindset #SelfImprovement',
-        '"You survived 100% of your worst days. You\'re doing great." 🌈 #Survivor #Strength #MentalHealth #Hope',
-        '"Your healing journey is valid, no matter how long it takes." 🌱 #HealingJourney #Patience #SelfCompassion #Growth',
+        '"The only way to do great work is to love what you do." - Steve Jobs 🚀 #Motivation #Inspiration #Success',
+        '"Believe you can and you\'re halfway there." - Theodore Roosevelt 💪 #Mindset #Believe #PositiveThinking',
+        '"The future belongs to those who believe in the beauty of their dreams." - Eleanor Roosevelt ✨ #Dreams #Future #Hope',
+        '"Don\'t watch the clock; do what it does. Keep going." - Sam Levenson 🌟 #Motivation #HardWork #Persistence',
+        '"The only limit to our realization of tomorrow will be our doubts of today." - Franklin D. Roosevelt 📈 #Inspiration #Mindset #Success',
+        '"It always seems impossible until it\'s done." - Nelson Mandela 🌈 #Impossible #Achievement #Motivation',
+        '"The best way to predict your future is to create it." - Peter Drucker 🌱 #Future #CreateYourLife #Inspiration',
+        '"Success is not final, failure is not fatal: It is the courage to continue that counts." - Winston Churchill 💖 #Success #Courage #Resilience',
       ],
     },
     // Empowerment with trending hashtags
     {
       type: "empowerment",
       templates: [
-        "You are {adjective} than you think. You are {quality} beyond measure. Remember that today. 💖 #SelfLove #Empowerment #WomenSupportingWomen #MondayMotivation",
-        "Your {emotion} is valid. Your journey is yours alone. Trust the process. 🦋 #MentalHealthMatters #Healing #SelfCare #Mindfulness",
-        "Stop shrinking yourself to make others comfortable. Take up space. You belong here. 👑 #SelfWorth #Confidence #WomenEmpowerment #BeBold",
-        "Your past doesn't define you. Your {action} does. Keep going. 🌟 #NewBeginnings #Growth #Motivation #Resilience",
+        "You are {adjective} than you think. You are {quality} beyond measure. Remember that today. 💖 #SelfLove #Empowerment #Motivation",
+        "Your {emotion} is valid. Your journey is yours alone. Trust the process. 🦋 #MentalHealthMatters #SelfCare #Mindfulness",
+        "Stop shrinking yourself to make others comfortable. Take up space. You belong here. 👑 #SelfWorth #Confidence #BeBold",
+        "Your past doesn't define you. Your {action} does. Keep going. 🌟 #NewBeginnings #Growth #Motivation",
       ],
     },
     // Daily affirmations with engagement
     {
       type: "affirmations",
       templates: [
-        'Daily Affirmation: "I am {affirmation}" 🌸 Save this if you need the reminder! #DailyAffirmation #SelfLove #Mindset #Positivity',
-        'Repeat after me: "I am worthy of {desire}" 💕 Like if you believe it! #Affirmations #SelfWorth #LoveYourself #Healing',
-        "Today's mantra: \"{mantra}\" 🧘‍♀️ What's yours? Share below! #Mindfulness #Meditation #SelfCare #MentalHealth",
+        'Daily Affirmation: "I am {affirmation}" 🌸 Save this if you need the reminder! #DailyAffirmation #SelfLove #Mindset',
+        'Repeat after me: "I am worthy of {desire}" 💕 Like if you believe it! #Affirmations #SelfWorth #LoveYourself',
+        "Today's mantra: \"{mantra}\" 🧘‍♀️ What's yours? Share below! #Mindfulness #Meditation #SelfCare",
       ],
     },
     // Questions for engagement
     {
       type: "engagement",
       templates: [
-        "What's one thing you're grateful for today? Let's spread some positivity! 🌻 #Gratitude #Positivity #MentalHealth #Community",
-        "How do you practice self-love when you're feeling low? Share your tips! 💛 #SelfCare #MentalHealthTips #Community #Support",
-        "What song instantly lifts your mood? Drop it below! 🎵 #MusicHeals #Mood #Community #ShareYourVibes",
-        "What's one piece of advice you'd give to your younger self? 💭 #Wisdom #Growth #Life #Reflection",
+        "What's one thing you're grateful for today? Let's spread some positivity! 🌻 #Gratitude #Positivity #MentalHealth",
+        "What's your favorite way to stay motivated? Share your tips! 💛 #Motivation #Productivity #SelfCare",
+        "What song instantly lifts your mood? Drop it below! 🎵 #MusicHeals #Mood #ShareYourVibes",
+        "What's one piece of advice you'd give to your younger self? 💭 #Wisdom #Life #Reflection",
       ],
     },
   ];
@@ -121,13 +122,13 @@ function generateTemplateContent() {
       "important",
     ],
     emotion: [
-      "pain",
-      "struggle",
-      "healing",
-      "journey",
-      "growth",
-      "transformation",
+      "passion",
+      "drive",
+      "ambition",
+      "focus",
+      "determination",
       "courage",
+      "resilience",
     ],
     action: [
       "resilience",
@@ -143,7 +144,7 @@ function generateTemplateContent() {
       "worthy of love",
       "deserving of happiness",
       "growing every day",
-      "beautiful inside and out",
+      "capable of anything",
       "stronger than I know",
     ],
     desire: [
@@ -151,14 +152,15 @@ function generateTemplateContent() {
       "peace that lasts",
       "joy that heals",
       "respect that honors you",
-      "kindness that lifts you",
+      "success that fulfills you",
+      "happiness that sustains you",
     ],
     mantra: [
       "I am exactly where I need to be",
-      "I choose peace over perfection",
+      "I choose progress over perfection",
       "I am worthy of good things",
       "I trust my journey",
-      "I am healing at my own pace",
+      "I am capable of achieving my goals",
     ],
   };
 
