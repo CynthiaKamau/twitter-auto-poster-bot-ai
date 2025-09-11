@@ -30,10 +30,25 @@ async function run() {
 async function generateAIContent() {
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const prompt =
-    "You are creating content for Twitter/X. Generate an uplifting and motivational tweet. Focus on positivity, achieving goals, overcoming challenges, and inspiring others. The message should be authentic and remind people of their potential. IMPORTANT: The tweet must be EXACTLY under 280 characters including spaces, emojis, and hashtags. Use plain text with emojis and include 2-3 relevant hashtags like #Motivation #Inspiration #Success. Make it feel personal and supportive. Do not exceed 280 characters.";
+  // Rotate between different prompt styles for variety
+  const prompts = [
+    "Create a motivational Twitter/X tweet about achieving success and reaching goals. Focus on perseverance and self-belief. Include 2-3 hashtags like #Success #Goals #Mindset. Keep under 280 characters with emojis.",
+    "Write an inspiring Twitter/X tweet about personal growth and overcoming obstacles. Make it authentic and empowering. Use hashtags like #Growth #Motivation #Resilience. Must be under 280 characters with emojis.",
+    "Generate a positive Twitter/X tweet about daily motivation and self-improvement. Focus on taking action and staying focused. Include hashtags like #Motivation #DailyInspiration #Action. Under 280 characters with emojis.",
+    "Create an uplifting Twitter/X tweet about believing in yourself and your potential. Make it encouraging and personal. Use hashtags like #SelfBelief #Potential #Inspiration. Keep under 280 characters with emojis.",
+    "Write a motivational Twitter/X tweet about productivity and achieving dreams. Focus on consistency and hard work. Include hashtags like #Productivity #Dreams #HardWork. Must be under 280 characters with emojis.",
+    "Generate a Twitter/X tweet about overcoming fear and taking risks. Focus on courage and stepping out of comfort zones. Include hashtags like #Courage #RiskTaking #GrowthMindset. Under 280 characters with emojis.",
+    "Create a Twitter/X tweet about finding inner strength during tough times. Be authentic and hopeful. Use hashtags like #InnerStrength #Resilience #Hope. Keep under 280 characters with emojis.",
+    "Write a Twitter/X tweet about celebrating small wins and progress. Focus on gratitude and momentum. Include hashtags like #SmallWins #Progress #Gratitude. Must be under 280 characters with emojis.",
+  ];
 
-  const result = await model.generateContent(prompt);
+  // Use timestamp to add more randomness and prevent repetition
+  const timeBasedIndex = Math.floor(Date.now() / 1000) % prompts.length;
+  const randomOffset = Math.floor(Math.random() * 3); // Add some randomness
+  const promptIndex = (timeBasedIndex + randomOffset) % prompts.length;
+  const selectedPrompt = prompts[promptIndex];
+
+  const result = await model.generateContent(selectedPrompt);
   const response = await result.response;
   let text = response.text();
 
@@ -69,6 +84,10 @@ function generateTemplateContent() {
         '"It always seems impossible until it\'s done." - Nelson Mandela 🌈 #Impossible #Achievement #Motivation',
         '"The best way to predict your future is to create it." - Peter Drucker 🌱 #Future #CreateYourLife #Inspiration',
         '"Success is not final, failure is not fatal: It is the courage to continue that counts." - Winston Churchill 💖 #Success #Courage #Resilience',
+        "Small steps daily lead to big changes yearly. What step will you take today? 🔥 #Progress #GrowthMindset #TakeAction",
+        "The comeback is always stronger than the setback. Keep pushing! 💪 #Resilience #NeverGiveUp #Motivation",
+        "Your potential is endless. Your opportunities are limitless. Your time is now! ⚡ #Unlimited #Potential #Success",
+        "Champions train when nobody is watching. Are you training today? 🏆 #Excellence #Dedication #Champion",
       ],
     },
     // Empowerment with trending hashtags
@@ -98,6 +117,26 @@ function generateTemplateContent() {
         "What's your favorite way to stay motivated? Share your tips! 💛 #Motivation #Productivity #SelfCare",
         "What song instantly lifts your mood? Drop it below! 🎵 #MusicHeals #Mood #ShareYourVibes",
         "What's one piece of advice you'd give to your younger self? 💭 #Wisdom #Life #Reflection",
+      ],
+    },
+    // Success tips
+    {
+      type: "success_tips",
+      templates: [
+        "Success tip: Focus on progress, not perfection. Every small step counts! 📈 #SuccessTips #Progress #Mindset",
+        "Reminder: Your biggest competition is who you were yesterday. Keep evolving! 🔥 #Growth #SelfImprovement #Success",
+        "Monday mindset: Start where you are, use what you have, do what you can. 💪 #MondayMotivation #Action #Mindset",
+        "The difference between ordinary and extraordinary is that little 'extra'. Give it today! ✨ #Excellence #Motivation #Success",
+      ],
+    },
+    // Action-oriented posts
+    {
+      type: "action_oriented",
+      templates: [
+        "Stop waiting for the perfect moment. Start now with what you have! 🚀 #TakeAction #NoExcuses #StartNow",
+        "Your dreams don't work unless you do. What action will you take today? 💯 #Dreams #Action #Hustle",
+        "The time you spend wishing you could is time you could spend doing. Start today! ⚡ #Action #Productivity #Success",
+        "Every expert was once a beginner. Every pro was once an amateur. Start somewhere! 🌟 #BeginnersMindset #Growth #Journey",
       ],
     },
   ];
