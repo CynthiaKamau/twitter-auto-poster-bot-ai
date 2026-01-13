@@ -14,20 +14,84 @@ const genAI = new GoogleGenerativeAI(SECRETS.GEMINI_API_KEY);
 
 async function run() {
   try {
-    // Generate AI content and tweet it; no fallback to avoid repeats
     const generatedText = await generateAIContent();
     console.log("Generated AI text:", generatedText);
     await sendTweet(generatedText);
   } catch (error) {
     console.error("Error generating AI content:", error);
-    console.error(
-      "No tweet sent. Fix Gemini API issues or re-enable fallback if desired."
-    );
+    console.log("Falling back to template content to keep posting.");
+    const fallbackText = generateTemplateContent();
+    console.log("Using template-generated message:", fallbackText);
+    await sendTweet(fallbackText);
   }
 }
 
 async function generateAIContent() {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  // Allow overriding model via env; support multiple candidates
+  const candidatesFromEnv = process.env.GEMINI_MODEL
+    ? process.env.GEMINI_MODEL.split(",")
+        .map((m) => m.trim())
+        .filter(Boolean)
+    : [];
+  const candidateModels = [
+    ...candidatesFromEnv,
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-latest",
+    "gemini-1.0-pro",
+    "gemini-pro",
+  ];
+
+  let lastError;
+  for (const modelName of candidateModels) {
+    try {
+      console.log(`Attempting Gemini model: ${modelName}`);
+      const model = genAI.getGenerativeModel({ model: modelName });
+
+      // Rotate between different prompt styles for variety
+      const prompts = [
+        "Create a Twitter/X post about living healthy, loving yourself, moving your body, reading, and embracing therapy. Warm tone, 2-3 relevant hashtags (e.g., #SelfLove #HealthyHabits #Therapy) and emojis. Under 280 characters.",
+        "Write a Twitter/X post on working hard in career or business: discipline, consistency, shipping work. Confident but humble tone. Add 2-3 hashtags like #CareerGrowth #BuildInPublic #Discipline with emojis. Under 280 characters.",
+        "Generate a Twitter/X post about peace and forgiveness—choosing to let go, protect energy, and stay kind. Include 2-3 hashtags such as #Peace #LetGo #Forgiveness with gentle emojis. Under 280 characters.",
+        "Craft a Twitter/X post about living like it's the last day: gratitude, courage, giving your best. Add 2-3 hashtags like #Gratitude #BestDay #NoRegrets with emojis. Under 280 characters.",
+        "Write a Twitter/X post on cultivating good relationships and being the bigger person: empathy, boundaries, checking on people. Include hashtags like #Relationships #Kindness #Growth with emojis. Under 280 characters.",
+        "Create a Twitter/X carousel-friendly blurb for healthy routines: workout, water, reading, therapy, sleep. Conversational, 2-3 hashtags (#Wellness #Habits #SelfCare) with emojis. Under 280 characters.",
+        "Generate a Twitter/X post about career focus: protect deep work, learn daily, document, ship. Motivating and clear. Use 2-3 hashtags (#WorkSmart #Career #Execution) with emojis. Under 280 characters.",
+        "Write a Twitter/X post about forgiving others to free yourself, keeping relationships light, and choosing peace. 2-3 hashtags (#Healing #Peace #Growth) with soft emojis. Under 280 characters.",
+      ];
+
+      // Pick a prompt purely at random to reduce repetition
+      const promptIndex = Math.floor(Math.random() * prompts.length);
+      const selectedPrompt = prompts[promptIndex];
+
+      const result = await model.generateContent(selectedPrompt);
+      const response = await result.response;
+      let text = response.text();
+
+      // Clean up and ensure it's tweet-appropriate
+      text = text.trim();
+
+      // Extra safety check - if still too long after Gemini's attempt
+      if (text.length > 280) {
+        console.log(
+          `⚠️ Gemini generated ${text.length} characters. Truncating...`
+        );
+        text = text.substring(0, 277) + "...";
+      }
+
+      if (!text || text.length < 20) {
+        throw new Error("Generated text too short");
+      }
+
+      console.log(`📝 AI generated text: ${text.length}/280 characters`);
+      return text;
+    } catch (err) {
+      lastError = err;
+      console.error(`Model ${modelName} failed:`, err?.message || err);
+      // Try next candidate
+    }
+  }
+
+  throw lastError || new Error("All Gemini model attempts failed");
 
   // Rotate between different prompt styles for variety
   const prompts = [
