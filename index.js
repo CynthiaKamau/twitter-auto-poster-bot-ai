@@ -14,16 +14,15 @@ const genAI = new GoogleGenerativeAI(SECRETS.GEMINI_API_KEY);
 
 async function run() {
   try {
-    // Try to generate AI content first
+    // Generate AI content and tweet it; no fallback to avoid repeats
     const generatedText = await generateAIContent();
     console.log("Generated AI text:", generatedText);
-    sendTweet(generatedText);
+    await sendTweet(generatedText);
   } catch (error) {
     console.error("Error generating AI content:", error);
-    // Only use fallback if AI generation fails
-    const fallbackText = generateTemplateContent();
-    console.log("Using template-generated message:", fallbackText);
-    sendTweet(fallbackText);
+    console.error(
+      "No tweet sent. Fix Gemini API issues or re-enable fallback if desired."
+    );
   }
 }
 
@@ -32,20 +31,18 @@ async function generateAIContent() {
 
   // Rotate between different prompt styles for variety
   const prompts = [
-    "Create a motivational Twitter/X tweet about achieving success and reaching goals. Focus on perseverance and self-belief. Include 2-3 hashtags like #Success #Goals #Mindset. Keep under 280 characters with emojis.",
-    "Write an inspiring Twitter/X tweet about personal growth and overcoming obstacles. Make it authentic and empowering. Use hashtags like #Growth #Motivation #Resilience. Must be under 280 characters with emojis.",
-    "Generate a positive Twitter/X tweet about daily motivation and self-improvement. Focus on taking action and staying focused. Include hashtags like #Motivation #DailyInspiration #Action. Under 280 characters with emojis.",
-    "Create an uplifting Twitter/X tweet about believing in yourself and your potential. Make it encouraging and personal. Use hashtags like #SelfBelief #Potential #Inspiration. Keep under 280 characters with emojis.",
-    "Write a motivational Twitter/X tweet about productivity and achieving dreams. Focus on consistency and hard work. Include hashtags like #Productivity #Dreams #HardWork. Must be under 280 characters with emojis.",
-    "Generate a Twitter/X tweet about overcoming fear and taking risks. Focus on courage and stepping out of comfort zones. Include hashtags like #Courage #RiskTaking #GrowthMindset. Under 280 characters with emojis.",
-    "Create a Twitter/X tweet about finding inner strength during tough times. Be authentic and hopeful. Use hashtags like #InnerStrength #Resilience #Hope. Keep under 280 characters with emojis.",
-    "Write a Twitter/X tweet about celebrating small wins and progress. Focus on gratitude and momentum. Include hashtags like #SmallWins #Progress #Gratitude. Must be under 280 characters with emojis.",
+    "Create a Twitter/X post about living healthy, loving yourself, moving your body, reading, and embracing therapy. Warm tone, 2-3 relevant hashtags (e.g., #SelfLove #HealthyHabits #Therapy) and emojis. Under 280 characters.",
+    "Write a Twitter/X post on working hard in career or business: discipline, consistency, shipping work. Confident but humble tone. Add 2-3 hashtags like #CareerGrowth #BuildInPublic #Discipline with emojis. Under 280 characters.",
+    "Generate a Twitter/X post about peace and forgiveness—choosing to let go, protect energy, and stay kind. Include 2-3 hashtags such as #Peace #LetGo #Forgiveness with gentle emojis. Under 280 characters.",
+    "Craft a Twitter/X post about living like it's the last day: gratitude, courage, giving your best. Add 2-3 hashtags like #Gratitude #BestDay #NoRegrets with emojis. Under 280 characters.",
+    "Write a Twitter/X post on cultivating good relationships and being the bigger person: empathy, boundaries, checking on people. Include hashtags like #Relationships #Kindness #Growth with emojis. Under 280 characters.",
+    "Create a Twitter/X carousel-friendly blurb for healthy routines: workout, water, reading, therapy, sleep. Conversational, 2-3 hashtags (#Wellness #Habits #SelfCare) with emojis. Under 280 characters.",
+    "Generate a Twitter/X post about career focus: protect deep work, learn daily, document, ship. Motivating and clear. Use 2-3 hashtags (#WorkSmart #Career #Execution) with emojis. Under 280 characters.",
+    "Write a Twitter/X post about forgiving others to free yourself, keeping relationships light, and choosing peace. 2-3 hashtags (#Healing #Peace #Growth) with soft emojis. Under 280 characters.",
   ];
 
-  // Use timestamp to add more randomness and prevent repetition
-  const timeBasedIndex = Math.floor(Date.now() / 1000) % prompts.length;
-  const randomOffset = Math.floor(Math.random() * 3); // Add some randomness
-  const promptIndex = (timeBasedIndex + randomOffset) % prompts.length;
+  // Pick a prompt purely at random to reduce repetition
+  const promptIndex = Math.floor(Math.random() * prompts.length);
   const selectedPrompt = prompts[promptIndex];
 
   const result = await model.generateContent(selectedPrompt);
@@ -72,134 +69,83 @@ async function generateAIContent() {
 function generateTemplateContent() {
   // Enhanced content with general motivational themes
   const contentTypes = [
-    // General motivational quotes
+    // Healthy lifestyle, self-love, movement, reading, therapy
     {
-      type: "motivational_quotes",
+      type: "health_self_love",
       templates: [
-        '"The only way to do great work is to love what you do." - Steve Jobs 🚀 #Motivation #Inspiration #Success',
-        '"Believe you can and you\'re halfway there." - Theodore Roosevelt 💪 #Mindset #Believe #PositiveThinking',
-        '"The future belongs to those who believe in the beauty of their dreams." - Eleanor Roosevelt ✨ #Dreams #Future #Hope',
-        '"Don\'t watch the clock; do what it does. Keep going." - Sam Levenson 🌟 #Motivation #HardWork #Persistence',
-        '"The only limit to our realization of tomorrow will be our doubts of today." - Franklin D. Roosevelt 📈 #Inspiration #Mindset #Success',
-        '"It always seems impossible until it\'s done." - Nelson Mandela 🌈 #Impossible #Achievement #Motivation',
-        '"The best way to predict your future is to create it." - Peter Drucker 🌱 #Future #CreateYourLife #Inspiration',
-        '"Success is not final, failure is not fatal: It is the courage to continue that counts." - Winston Churchill 💖 #Success #Courage #Resilience',
-        "Small steps daily lead to big changes yearly. What step will you take today? 🔥 #Progress #GrowthMindset #TakeAction",
-        "The comeback is always stronger than the setback. Keep pushing! 💪 #Resilience #NeverGiveUp #Motivation",
-        "Your potential is endless. Your opportunities are limitless. Your time is now! ⚡ #Unlimited #Potential #Success",
-        "Champions train when nobody is watching. Are you training today? 🏆 #Excellence #Dedication #Champion",
+        "New year rhythm: hydrate, move 30 mins, read 20 pages, therapy on the calendar, kind words in the mirror. 📚💪 #SelfLove #HealthyHabits #Therapy",
+        "My self-love kit: morning stretch, nourishing meals, honest therapy session, a chapter before bed. Small rituals, big peace. 🌿 #Wellness #Routine #SelfCare",
+        "Body, mind, heart checklist: workout done, pages read, feelings named, therapist texted, water refilled. Keep choosing you. ✨ #HealthyLifestyle #MentalHealth #Growth",
+        "Protect your energy: gym shoes ready, book by the bed, therapist on speed dial, softer self-talk on repeat. 🧠💙 #Healing #SelfLove #Habits",
       ],
     },
-    // Empowerment with trending hashtags
+    // Working hard in career/business
     {
-      type: "empowerment",
+      type: "career_grind",
       templates: [
-        "You are {adjective} than you think. You are {quality} beyond measure. Remember that today. 💖 #SelfLove #Empowerment #Motivation",
-        "Your {emotion} is valid. Your journey is yours alone. Trust the process. 🦋 #MentalHealthMatters #SelfCare #Mindfulness",
-        "Stop shrinking yourself to make others comfortable. Take up space. You belong here. 👑 #SelfWorth #Confidence #BeBold",
-        "Your past doesn't define you. Your {action} does. Keep going. 🌟 #NewBeginnings #Growth #Motivation",
+        "Career mode: block deep work, ship something daily, ask better questions, document lessons. Consistency is the cheat code. 🚀 #CareerGrowth #Execution #Discipline",
+        "Business note: momentum beats motivation. Build, test, learn, repeat. Less waiting, more shipping. ⚡ #BuildInPublic #StartupLife #Action",
+        "Hard work isn't loud; results are. Protect focus, deliver value, follow up, stay humble. 📈 #WorkEthic #ProfessionalGrowth #Consistency",
+        "Today's stack: early start, tight priorities, one brave email, one shipped deliverable. Show up, stack wins. 🛠️ #Career #Discipline #Progress",
       ],
     },
-    // Daily affirmations with engagement
+    // Peace and forgiveness
     {
-      type: "affirmations",
+      type: "peace_forgiveness",
       templates: [
-        'Daily Affirmation: "I am {affirmation}" 🌸 Save this if you need the reminder! #DailyAffirmation #SelfLove #Mindset',
-        'Repeat after me: "I am worthy of {desire}" 💕 Like if you believe it! #Affirmations #SelfWorth #LoveYourself',
-        "Today's mantra: \"{mantra}\" 🧘‍♀️ What's yours? Share below! #Mindfulness #Meditation #SelfCare",
+        "Peace over replay: I release the reruns, keep the lesson, and choose a lighter heart. 🌿 #Peace #LetGo #Forgiveness",
+        "Forgiveness isn't approval—it's freedom. I am choosing to walk lighter this year. 🤍 #Healing #Grace #Growth",
+        "Not carrying last year's grudges into this year's plans. Protecting energy and keeping my heart soft. ✨ #Boundaries #Peace #Forgive",
+        "Letting go is productive. Less rumination, more room for joy. 🌱 #MentalHealth #Peace #Clarity",
       ],
     },
-    // Questions for engagement
+    // Living like it's the last day
     {
-      type: "engagement",
+      type: "last_day_energy",
       templates: [
-        "What's one thing you're grateful for today? Let's spread some positivity! 🌻 #Gratitude #Positivity #MentalHealth",
-        "What's your favorite way to stay motivated? Share your tips! 💛 #Motivation #Productivity #SelfCare",
-        "What song instantly lifts your mood? Drop it below! 🎵 #MusicHeals #Mood #ShareYourVibes",
-        "What's one piece of advice you'd give to your younger self? 💭 #Wisdom #Life #Reflection",
+        "Last-day energy: say the kind thing, take the shot, call your people, give your best, rest without guilt. 💫 #NoRegrets #Gratitude #LiveFully",
+        "If today was the last chapter, would you be proud of this paragraph? Go all in. 📝 #BestDay #Courage #Presence",
+        "No idle days: express gratitude, move your body, build something, love loudly. 🧭 #LiveNow #Purpose #Gratitude",
+        "Leave nothing unsaid, no effort unmade. Love hard, work smart, rest well. 🌅 #NoRegrets #BestEffort #Life",
       ],
     },
-    // Success tips
+    // Relationships and being the bigger person
     {
-      type: "success_tips",
+      type: "relationships",
       templates: [
-        "Success tip: Focus on progress, not perfection. Every small step counts! 📈 #SuccessTips #Progress #Mindset",
-        "Reminder: Your biggest competition is who you were yesterday. Keep evolving! 🔥 #Growth #SelfImprovement #Success",
-        "Monday mindset: Start where you are, use what you have, do what you can. 💪 #MondayMotivation #Action #Mindset",
-        "The difference between ordinary and extraordinary is that little 'extra'. Give it today! ✨ #Excellence #Motivation #Success",
-      ],
-    },
-    // Action-oriented posts
-    {
-      type: "action_oriented",
-      templates: [
-        "Stop waiting for the perfect moment. Start now with what you have! 🚀 #TakeAction #NoExcuses #StartNow",
-        "Your dreams don't work unless you do. What action will you take today? 💯 #Dreams #Action #Hustle",
-        "The time you spend wishing you could is time you could spend doing. Start today! ⚡ #Action #Productivity #Success",
-        "Every expert was once a beginner. Every pro was once an amateur. Start somewhere! 🌟 #BeginnersMindset #Growth #Journey",
+        "Check on your people, celebrate their wins, listen without fixing. Relationships are built, not assumed. 🤝 #Relationships #Community #Kindness",
+        "Being the bigger person = respect + boundaries + grace. Strength without being a doormat. 🧘 #Maturity #Growth #Empathy",
+        "New year pact: fewer assumptions, more questions; fewer walls, more bridges. 🪜 #Connection #Relationships #Understanding",
+        "Lead with kindness, keep your boundaries, choose repair over ego. 🌉 #BiggerPerson #Peace #HealthyRelationships",
       ],
     },
   ];
 
   const replacements = {
-    adjective: [
-      "stronger",
-      "braver",
-      "more resilient",
-      "more capable",
-      "more beautiful",
-      "wiser",
-      "more powerful",
-    ],
-    quality: [
-      "beautiful",
-      "worthy",
-      "amazing",
-      "enough",
-      "valued",
-      "loved",
-      "important",
-    ],
-    emotion: [
-      "passion",
-      "drive",
-      "ambition",
-      "focus",
-      "determination",
-      "courage",
-      "resilience",
-    ],
-    action: [
-      "resilience",
-      "courage",
-      "kindness",
-      "strength",
-      "growth",
-      "healing",
-      "journey",
-    ],
+    adjective: ["stronger", "braver", "kinder", "steadier", "lighter"],
+    quality: ["worthy", "enough", "valuable", "loved", "respected"],
+    emotion: ["peace", "focus", "courage", "hope", "clarity", "joy"],
+    action: ["healing", "growth", "kindness", "courage", "repair"],
     affirmation: [
-      "enough as I am",
-      "worthy of love",
-      "deserving of happiness",
-      "growing every day",
-      "capable of anything",
-      "stronger than I know",
+      "exactly who I need to be",
+      "worthy of rest and success",
+      "capable of hard and soft things",
+      "growing wiser daily",
+      "deserving of healthy love",
     ],
     desire: [
-      "love that stays",
       "peace that lasts",
-      "joy that heals",
-      "respect that honors you",
-      "success that fulfills you",
-      "happiness that sustains you",
+      "love that is mutual",
+      "growth that feels good",
+      "work that matters",
+      "rest that restores",
     ],
     mantra: [
-      "I am exactly where I need to be",
-      "I choose progress over perfection",
-      "I am worthy of good things",
-      "I trust my journey",
-      "I am capable of achieving my goals",
+      "I honor my pace",
+      "I give my best and let go",
+      "I am allowed to rest",
+      "I lead with kindness and boundaries",
+      "I choose peace and progress",
     ],
   };
 
